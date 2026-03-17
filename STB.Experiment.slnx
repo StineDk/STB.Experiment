@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/API/">
+    <Project Path="STB.Experiment.API/STB.Experiment.API.csproj" />
+  </Folder>
+  <Folder Name="/AppHost/">
+    <Project Path="STB.Experiment.AppHost/STB.Experiment.AppHost.csproj" />
+    <Project Path="STB.Experiment.ServiceDefaults/STB.Experiment.ServiceDefaults.csproj" />
+  </Folder>
+  <Folder Name="/Domain/">
+    <Project Path="STB.Experiment.Domain/STB.Experiment.Domain.csproj" Id="36f08b3e-3e76-4c1a-8423-bcd61a88d12f" />
+  </Folder>
+</Solution>
