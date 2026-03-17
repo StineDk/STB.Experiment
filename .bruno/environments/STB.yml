@@ -2,3 +2,5 @@ name: STB
 variables:
   - name: BaseUrl
     value: http://localhost:5073
+  - secret: true
+    name: JwtToken

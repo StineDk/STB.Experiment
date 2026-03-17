@@ -1,5 +1,5 @@
 info:
-  name: Register
+  name: Auth/Register
   type: http
   seq: 1
 

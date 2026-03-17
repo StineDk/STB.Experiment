@@ -1,5 +1,6 @@
 using STB.Experiment.API.Data;
 using STB.Experiment.API.Extentions;
+using STB.Experiment.API.Services;
 
 namespace STB.Experiment.API
 {
@@ -14,6 +15,7 @@ namespace STB.Experiment.API
 
 			builder.Services.AddDbContext<AppDbContext>();
 			builder.Services.AddJwtAuthentication(builder.Configuration);
+			builder.Services.AddScoped<JwtService>();
 
 			builder.Services.AddControllers();
 			// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -30,8 +32,8 @@ namespace STB.Experiment.API
 				app.ApplyMigrations();
 			}
 
+			app.UseAuthentication();
 			app.UseAuthorization();
-
 
 			app.MapControllers();
 
