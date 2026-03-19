@@ -16,6 +16,7 @@ namespace STB.Experiment.API
 			builder.Services.AddDbContext<AppDbContext>();
 			builder.Services.AddJwtAuthentication(builder.Configuration);
 			builder.Services.AddScoped<JwtService>();
+			builder.Services.AddScoped<AuthService>();
 
 			builder.Services.AddControllers();
 			// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

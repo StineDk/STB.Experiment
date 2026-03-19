@@ -1,11 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using STB.Experiment.API.Data;
 using STB.Experiment.API.Services;
-using STB.Experiment.Domain.Models.Database;
-using STB.Experiment.Domain.Models.Options;
 using STB.Experiment.Domain.Models.Responses;
 
 namespace STB.Experiment.API.Controllers
@@ -15,54 +12,49 @@ namespace STB.Experiment.API.Controllers
 	public class AuthController : ControllerBase
 	{
 		private readonly AppDbContext dbContext;
-		private readonly JwtAuthenticationOptions jwtOptions;
 		private readonly JwtService jwtService;
+		private readonly AuthService authService;
 
-		public AuthController(AppDbContext dbContext, JwtAuthenticationOptions jwtOptions, JwtService jwtService)
+		public AuthController(AppDbContext dbContext, JwtService jwtService, AuthService authService)
 		{
 			this.dbContext = dbContext;
-			this.jwtOptions = jwtOptions;
 			this.jwtService = jwtService;
+			this.authService = authService;
 		}
 
 		[HttpPost("Register")]
-		public async Task<ActionResult> RegisterAsync()
+		public async Task<ActionResult> RegisterAsync(RegisterRequest requestDto)
 		{
-			var user = new User
+			try
 			{
-				Username = "test",
-				PasswordHash = BCrypt.Net.BCrypt.HashPassword("password")
-			};
-
-			await dbContext.Users.AddAsync(user);
-			await dbContext.SaveChangesAsync();
-
-			return Created();
+				await authService.RegisterAsync(requestDto);
+				return Created();
+			}
+			catch (ArgumentNullException ex)
+			{
+				return BadRequest($"Missing object: {ex.Message}");
+			}
+			catch (Exception ex)
+			{
+				return BadRequest(ex.Message);
+			}
 		}
 
 		[HttpPost("Login")]
-		public async Task<ActionResult<LoginResponse>> LoginAsync(LoginRequest requestDto)
+		public async Task<ActionResult<AuthResult>> LoginAsync(LoginRequest requestDto)
 		{
-			if (requestDto == null) return BadRequest("Request body is required.");
-			if (string.IsNullOrEmpty(requestDto.Email)) return BadRequest("Username is required.");
-			if (string.IsNullOrEmpty(requestDto.Password)) return BadRequest("Password is required.");
-
-			var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Username == requestDto.Email);
-			if (user == null) return StatusCode(500);
-			if (string.IsNullOrEmpty(user.PasswordHash) || !BCrypt.Net.BCrypt.Verify(requestDto.Password, user.PasswordHash)) return BadRequest("Bad password");
-
-			var jwtToken = jwtService.GenerateJwtToken(user);
-			var refreshToken = await jwtService.GenerateRefreshToken();
-			dbContext.RefreshTokens.Add(new RefreshToken
+			try
 			{
-				Id = refreshToken,
-				UserId = user.Id,
-				Expires = DateTime.UtcNow.AddDays(7),
-				IsRevoked = false
-			});
-			await dbContext.SaveChangesAsync();
-
-			return Ok(new LoginResponse(jwtToken, 1800, refreshToken));
+				return await authService.LoginAsync(requestDto);
+			}
+			catch (ArgumentNullException ex)
+			{
+				return BadRequest($"Missing object: {ex.Message}");
+			}
+			catch (Exception ex)
+			{
+				return BadRequest(ex.Message);
+			}
 		}
 
 		[HttpGet("LoggedIn"), Authorize]

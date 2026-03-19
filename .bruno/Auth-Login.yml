@@ -10,8 +10,8 @@ http:
     type: json
     data: |-
       {
-        "Email": "test",
-        "Password": "password"
+        "Email": "Test",
+        "Password": "Password"
       }
   auth: inherit
 
@@ -21,7 +21,8 @@ runtime:
       code: |-
         if (res.status == 200) {
           const data = res.body;
-          bru.setEnvVar("JwtToken", data.token);
+          const loginRes = data.loginResponse
+          bru.setEnvVar("JwtToken", loginRes.token);
         }
 
 settings:
